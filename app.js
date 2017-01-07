@@ -16,17 +16,15 @@ app.get('/', function (req, res) {
     res.render('index')
 })
 
-app.get('/room', function (req, res) {
-    res.render('room')
+app.get('/rooms', function (req, res) {
+    var rooms = ['supimpa', 'soso', 'nope'];
+    res.render('rooms', {rooms: rooms})
 })
 
 
 //apis
-router.get('/rooms', function(req, res){
-    console.log('...')
+app.get('/room/:roomname', function(req, res){
+    res.render('room', {name: req.params.roomname})
 })
-
-app.use('/api', router)
-
 
 app.listen(3000)

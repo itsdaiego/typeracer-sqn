@@ -2,4 +2,6 @@ doctype html
 head
     title my jade template
   body
-      p #{name}
+      for room in rooms
+          a #{room} <br/>
+
