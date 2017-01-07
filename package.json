@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/drodrigo/typeracer-sqn#readme",
   "devDependencies": {
-    "express": "^4.14.0"
+    "express": "^4.14.0",
+    "jade": "^1.11.0",
+    "nodemon": "^1.11.0"
   }
 }
