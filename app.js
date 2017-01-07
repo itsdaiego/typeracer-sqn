@@ -11,13 +11,19 @@ router.use(function(req, res, next) {
 });
 
 
+//pages
 app.get('/', function (req, res) {
-    res.render('index.jade')
+    res.render('index')
+})
+
+app.get('/room', function (req, res) {
+    res.render('room')
 })
 
 
-router.get('/users', function(req, res){
-    res.send('Hello users')
+//apis
+router.get('/rooms', function(req, res){
+    console.log('...')
 })
 
 app.use('/api', router)
