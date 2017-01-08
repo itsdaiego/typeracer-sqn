@@ -1,25 +1,28 @@
-var express = require('express')
-var app = express()
+var express = require('express');
+
+var app = express();
+var server = app.listen(3000);
+
+var socket = require('socket.io');
+var io = socket(server);
+
+var roomData = require('./models/room');
+
 app.set('view engine', 'jade');
-
-
-var router = express.Router()
-
-router.use(function(req, res, next) {
-    next()
-});
-
-
-app.get('/', function (req, res) {
-    res.render('index')
-})
+app.use(express.static(__dirname + '/views'));
 
 app.get('/room/:roomname/user/:username', function(req, res){
     var room = {
         username: req.params.username,
         roomname: req.params.roomname
-    }
-    res.render('room', room)
-})
+    };
 
-app.listen(3000)
+    roomData.setRoomData(room);
+    res.render('room', room);
+});
+
+io.sockets.on('connection', function (socket) {
+    var data = roomData.getRoomData(); 
+    socket.emit('welcome', { content: data }); 
+});
+
