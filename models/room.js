@@ -1,4 +1,5 @@
 var roomData;
+var roomList = [];
 
 module.exports = {
     setRoomData: function(room){
@@ -7,5 +8,13 @@ module.exports = {
 
     getRoomData: function(){
         return roomData;
+    },
+
+    addRoom: function(room){
+        roomList.push(room);
+    },
+
+    getRoomList: function(){
+        return roomList
     }
 }
