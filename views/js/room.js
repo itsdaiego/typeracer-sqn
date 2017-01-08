@@ -11,5 +11,5 @@ socket.on('welcome', function(data){
 
 function pushUserName(username){
     var el = document.getElementById("username");
-    el.innerHTML = username;
+    el.innerHTML += username + '<br/>';
 }

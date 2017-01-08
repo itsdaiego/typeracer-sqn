@@ -22,7 +22,8 @@ app.get('/room/:roomname/user/:username', function(req, res){
 });
 
 io.sockets.on('connection', function (socket) {
-    var data = roomData.getRoomData(); 
+    var data = roomData.getRoomData();
     socket.emit('welcome', { content: data }); 
+    socket.broadcast.emit('welcome', { content: data }); 
 });
 
