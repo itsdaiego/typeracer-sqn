@@ -12,7 +12,7 @@ app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/views'));
 
 app.get('/', function(re, res){
-    res.render('index')
+    res.render('index');
 });
 
 app.get('/room/:roomname/user/:username', function(req, res){
@@ -20,23 +20,12 @@ app.get('/room/:roomname/user/:username', function(req, res){
         username: req.params.username,
         roomname: req.params.roomname
     };
-
-    roomModel.setRoomData(room);
-    roomModel.addRoom(room.roomname);
+    
+    io.sockets.emit('newUser', room)
     res.render('room', room);
 });
 
 io.sockets.on('connection', function (socket) {
-    var ioRoom, roomname;
-    var data = roomModel.getRoomData();
-    socket.emit('welcome', data); 
-    socket.broadcast.emit('welcome', data); 
-
-    socket.on('createRoom', function(data){
-        rommanme = '/' + data.roomname; 
-        ioRoom = io.of(roomname);
-        ioRoom.emit(roomname, "hello");
-    });
-
+    var ioRoom = io.of(socket.roomname);
 });
 
