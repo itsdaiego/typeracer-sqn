@@ -20,12 +20,18 @@ app.get('/room/:roomname/user/:username', function(req, res){
         username: req.params.username,
         roomname: req.params.roomname
     };
-    
-    io.sockets.emit('newUser', room)
-    res.render('room', room);
-});
 
-io.sockets.on('connection', function (socket) {
-    var ioRoom = io.of(socket.roomname);
+    io.sockets.on('connection', function (socket) {
+        socket.username = req.params.username;
+        socket.roomname = req.params.roomname;
+
+        socket.emit('welcome', room)
+        var ioRoom = io.of('/' + socket.roomname)
+
+        ioRoom.emit('newUser', socket.username);
+
+    });
+    
+    res.render('room', room);
 });
 
