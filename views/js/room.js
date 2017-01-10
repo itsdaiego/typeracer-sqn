@@ -1,13 +1,13 @@
 var socket, roomname, ioRoom;
 var socket = io.connect('http://localhost:3000');
 
-socket.on('welcome', function(data){
-    pushUserName(data.username); 
-    joinedUser(data.username); 
-    ioRoom = io('/' + data.roomname);
-    ioRoom.on('newUser', function(username){
-    });
+socket.on('enterRoom', function(roomname){
+    console.log("ENTERED ROOM: " + roomname);
 });
+socket.on('newUser', function(username){
+    pushUserName(username);
+    joinedUser(username);
+})
 
 function pushUserName(username){
     var el = document.getElementById("username");
