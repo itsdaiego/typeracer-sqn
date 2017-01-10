@@ -7,7 +7,7 @@ socket.on('enterRoom', function(roomname){
 socket.on('newUser', function(username){
     pushUserName(username);
     joinedUser(username);
-})
+});
 
 function pushUserName(username){
     var el = document.getElementById("username");

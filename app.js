@@ -31,9 +31,9 @@ io.sockets.on('connection', function (socket) {
     socket.username = username;
     socket.room = roomname;
     users[username] = username;
-    console.log("joining room: " + roomname)
+    console.log("joining room: " + roomname);
     socket.join(roomname);
-    console.log("emiting to room: " + roomname)
+    console.log("emiting to room: " + roomname);
     socket.broadcast.to(roomname).emit('newUser', username);
 
 });
