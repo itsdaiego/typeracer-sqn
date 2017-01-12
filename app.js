@@ -13,7 +13,6 @@ app.get('/', function(re, res){
     res.render('index');
 });
 
-var users = {}
 
 app.get('/room/:roomname/user/:username', function(req, res){
     var room = {
@@ -23,28 +22,30 @@ app.get('/room/:roomname/user/:username', function(req, res){
     res.render('room', room);
 });
 
-var users  = {};
-
+var users = {};
 io.sockets.on('connection', function (socket) {
 
     socket.on('joinedRoom', function(roomData){
         socket.username = roomData.username;
         socket.room = roomData.roomname;
-        users[roomData.username] = roomData.username;
-        
-        console.log("Roomname: " + socket.room);
-        console.log("Username: " + socket.username);
+        var user = {
+            name: roomData.username,
+            score: 0
+        };
 
+        users[socket.id] = user;
+        
         socket.join(socket.room);
-        socket.broadcast.to(socket.room).emit('newUser', socket.username);
+        io.sockets.in(socket.room).emit('newPlayer', users);
+        socket.broadcast.to(socket.room).emit('joinedUser', users);
 
     });
 
     socket.on('disconnect', function(){
+        console.log("User left: " + JSON.stringify(users[socket.id]));
         socket.leave(socket.room);
-        socket.broadcast.emit('userLeft', socket.username);
-
-        console.log('Connection username: ' + socket.username);
+        delete users[socket.id];
+        socket.broadcast.to(socket.room).emit('userLeft', socket.username, users);
     });
 });
 
