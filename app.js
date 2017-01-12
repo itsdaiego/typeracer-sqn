@@ -42,7 +42,6 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function(){
-        console.log("User left: " + JSON.stringify(users[socket.id]));
         socket.leave(socket.room);
         delete users[socket.id];
         socket.broadcast.to(socket.room).emit('userLeft', socket.username, users);
