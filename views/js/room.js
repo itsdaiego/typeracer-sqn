@@ -7,16 +7,17 @@ socket.on('enterRoom', function(roomname){
 
 socket.on('newUser', function(username){
     pushUserName(username);
-    pushUserStatus(username, ' has joined the room <br/>')
+    pushUserStatus(username, ' has joined the room <br/>');
 });
 
 socket.on('newRoom', function(data){
-    alert(data)
+    alert(data);
 });
 
 socket.on('userLeft', function(username){
-    pushUserStatus(username, ' has left the room <br/>')
-})
+    pushUserStatus(username, ' has left the room <br/>');
+});
+
 
 function pushUserName(username){
     var el = document.getElementById("username");
