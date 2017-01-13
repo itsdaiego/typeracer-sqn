@@ -18,7 +18,6 @@ socket.on('joinedUser', function(users){
 
 socket.on('userLeft', function(users, users){
     clearJoinedUsers();
-    pushJoinedUsers(users, ' has left the room <br/>');
 });
 
 
