@@ -36,7 +36,7 @@ io.sockets.on('connection', function (socket) {
         users[socket.id] = user;
         
         socket.join(socket.room);
-        io.sockets.in(socket.room).emit('newPlayer', users);
+        io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
         socket.broadcast.to(socket.room).emit('joinedUser', users);
 
     });
@@ -44,7 +44,8 @@ io.sockets.on('connection', function (socket) {
     socket.on('disconnect', function(){
         socket.leave(socket.room);
         delete users[socket.id];
-        socket.broadcast.to(socket.room).emit('userLeft', socket.username, users);
+        io.sockets.in(socket.room).emit('userLeft', socket.username, users);
+        io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
     });
 });
 

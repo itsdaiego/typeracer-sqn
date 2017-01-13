@@ -6,9 +6,9 @@ socket.on('enterRoom', function(roomname){
     console.log("ENTERED ROOM: " + roomname);
 });
 
-socket.on('newPlayer', function(users){
+socket.on('refreshCurrentUsers', function(users){
     clearNewUsers();
-    pushNewPlayers(users);
+    refreshCurrentUsers(users);
 });
 
 socket.on('joinedUser', function(users){
@@ -22,7 +22,7 @@ socket.on('userLeft', function(users, users){
 });
 
 
-function pushNewPlayers(users){
+function refreshCurrentUsers(users){
     for(var properties in users){
         for(var property in users[properties]){
             if(property === 'name'){
