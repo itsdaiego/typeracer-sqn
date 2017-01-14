@@ -2,6 +2,7 @@ var socket, roomname, ioRoom;
 var socket = io.connect('http://localhost:3000');
 var users = [];
 var currentSentence = "";
+var listOfWords = [];
 var playerKeyStrokes = 0;
 var username;
 
@@ -28,6 +29,7 @@ socket.on('userLeft', function(username, users){
 
 socket.on('sentence', function(sentence){
     currentSentence = sentence;
+    listOfWords = currentSentence.split(' ');
     pushSentenceToPlayer(sentence);
 });
 
@@ -38,17 +40,50 @@ socket.on('startGame', function(){
 
 
 function startGame(){
-    var el = document.getElementById("type-listener");
-    el.addEventListener('keyup', function(){
-        console.log(this.value);
-    });
+    listenKeyStrokes();
 }
 
+function checkInputValue(inputValue){
+    var currentWord = listOfWords[0];
+    var inputValueList = inputValue.split('');
+    for(var i=0; i < inputValueList.length; i++){
+        if(inputValueList[i] !== currentWord[i]){
+            return false;
+        }
+    }
+    // listOfWords.shift(); 
+    return true;
+}
+
+function listenKeyStrokes(){
+    var el = document.getElementById("type-listener");
+    el.addEventListener('keyup', function(event){
+        if(event.keyCode === 32){
+            if(this.value.trim() === listOfWords[0]){
+                listOfWords.shift();
+                el.value = '';
+            }
+            return false;
+        }
+        var evaluation = checkInputValue(this.value, listOfWords[0]);
+        highlightInput(evaluation);
+    });
+}
 
 function pushSentenceToPlayer(sentence){
     var el = document.getElementById("type-area");
     el.innerHTML += sentence;
 }
+
+function highlightInput(evaluation){
+    var className = evaluation ? 'correct' : 'incorrect';
+    var el = document.getElementById('type-listener');
+    if(!el.classList.contains("incorrect")){
+        el.className +=  ' ' + className;
+    }
+
+}
+
 
 function refreshCurrentUsers(users){
     for(var properties in users){

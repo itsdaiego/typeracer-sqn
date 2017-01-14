@@ -41,8 +41,8 @@ io.sockets.on('connection', function (socket) {
     });
 
     setTimeout(function(){
-        io.sockets.in(socket.id).emit('startGame');
-        io.sockets.in(socket.id).emit('sentence', 'First sentence to be typed ');
+        socket.emit('startGame');
+        socket.emit('sentence', 'First sentence to be typed to client: ' + socket.id);
     }, 1000);
 
     socket.on('disconnect', function(){
