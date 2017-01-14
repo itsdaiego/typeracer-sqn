@@ -40,6 +40,10 @@ io.sockets.on('connection', function (socket) {
 
     });
 
+    setTimeout(function(){
+        socket.broadcast.to(socket.room).emit('sentence', 'Type me please');
+    }, 1000);
+
     socket.on('disconnect', function(){
         console.log("user left: " + JSON.stringify(users[socket.id]));
         socket.leave(socket.room);

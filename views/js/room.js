@@ -22,6 +22,15 @@ socket.on('userLeft', function(username, users){
 });
 
 
+socket.on('sentence', function(sentence){
+    pushSentenceToPlayer(sentence);
+});
+
+function pushSentenceToPlayer(sentence){
+    var el = document.getElementById("type-area");
+    el.innerHTML += sentence;
+}
+
 function refreshCurrentUsers(users){
     for(var properties in users){
         for(var property in users[properties]){
