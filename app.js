@@ -32,6 +32,8 @@ io.sockets.on('connection', function (socket) {
             score: 0
         };
 
+        socket.emit('userInfo', roomData);
+
         users[socket.id] = user;
 
         socket.join(socket.room);

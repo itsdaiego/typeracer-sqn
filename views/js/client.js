@@ -7,8 +7,8 @@ var playerKeyStrokes = 0;
 var username;
 
 
-socket.on('enterRoom', function(roomname){
-    console.log("ENTERED ROOM: " + roomname);
+socket.on('userInfo', function(data){
+    username = data.username;
 });
 
 socket.on('refreshCurrentUsers', function(users){
@@ -39,7 +39,22 @@ socket.on('startGame', function(){
 
 
 function startGame(){
-    listenToKeyStrokes();
+    evaluateKeyStroke();
+}
+
+function evaluateKeyStroke(){
+    var el = document.getElementById("type-listener");
+    el.addEventListener('keyup', function(event){
+        if(event.keyCode === 32 &&  (this.value.trim() === listOfWords[0]) ){
+            listOfWords.shift();
+            el.value = '';
+            return false;
+        }
+        var evaluation = checkInputValue(this.value, listOfWords[0]);
+        cleanHighlightInput();
+        highlightInput(evaluation);
+        updatePlayerKeyStrokes(evaluation);
+    });
 }
 
 function checkInputValue(inputValue){
@@ -51,20 +66,6 @@ function checkInputValue(inputValue){
         }
     }
     return true;
-}
-
-function listenToKeyStrokes(){
-    var el = document.getElementById("type-listener");
-    el.addEventListener('keyup', function(event){
-        if(event.keyCode === 32 &&  (this.value.trim() === listOfWords[0]) ){
-            listOfWords.shift();
-            el.value = '';
-            return false;
-        }
-        var evaluation = checkInputValue(this.value, listOfWords[0]);
-        cleanHighlightInput();
-        highlightInput(evaluation);
-    });
 }
 
 function pushSentenceToPlayer(sentence){
@@ -85,12 +86,20 @@ function cleanHighlightInput(){
     var el = document.getElementById('type-listener').className = "";
 }
 
+function updatePlayerKeyStrokes(evaluation){
+    if(evaluation){
+        playerKeyStrokes++;
+        var el = document.getElementById(username);
+        el.innerHtml = " " + playerKeyStrokes;
+    }
+}
+
 function refreshCurrentUsers(users){
     for(var properties in users){
         for(var property in users[properties]){
             if(property === 'name'){
-                var el = document.getElementById("username");
-                el.innerHTML += users[properties][property] + '<br/>';
+                var el = document.getElementById(username);
+                el.innerHTML += "<p id='"+username+"'>" + users[properties][property] + '<p>';
             }
         }
     }
@@ -102,7 +111,7 @@ function pushUsersNotification(username, message){
 }
 
 function clearNewUsers(){
-    var el = document.getElementById("username");
+    var el = document.getElementById(username);
     el.innerHTML = "";
 }
 
