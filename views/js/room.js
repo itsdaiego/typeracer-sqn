@@ -1,6 +1,7 @@
 var socket, roomname, ioRoom;
 var socket = io.connect('http://localhost:3000');
 var users = [];
+var currentSentence = "";
 
 socket.on('enterRoom', function(roomname){
     console.log("ENTERED ROOM: " + roomname);
@@ -23,8 +24,23 @@ socket.on('userLeft', function(username, users){
 
 
 socket.on('sentence', function(sentence){
+    currentSentence = sentence;
     pushSentenceToPlayer(sentence);
 });
+
+socket.on('startGame', function(){
+    startGame();
+});
+
+
+
+function startGame(){
+    var el = document.getElementById("type-listener");
+    el.addEventListener('keyup', function(){
+        console.log(this.value);
+    });
+}
+
 
 function pushSentenceToPlayer(sentence){
     var el = document.getElementById("type-area");

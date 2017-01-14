@@ -41,6 +41,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     setTimeout(function(){
+        socket.broadcast.to(socket.room).emit('startGame');
         socket.broadcast.to(socket.room).emit('sentence', 'Type me please');
     }, 1000);
 
