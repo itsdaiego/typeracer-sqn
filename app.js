@@ -24,7 +24,6 @@ app.get('/room/:roomname/user/:username', function(req, res){
 
 var users = {};
 io.sockets.on('connection', function (socket) {
-
     socket.on('joinedRoom', function(roomData){
         socket.username = roomData.username;
         socket.room = roomData.roomname;
@@ -34,19 +33,20 @@ io.sockets.on('connection', function (socket) {
         };
 
         users[socket.id] = user;
-        
+
         socket.join(socket.room);
         io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
-        socket.broadcast.to(socket.room).emit('joinedUser', users);
+        socket.broadcast.to(socket.room).emit('userJoined', socket.username);
 
     });
 
     socket.on('disconnect', function(){
+        console.log("user left: " + JSON.stringify(users[socket.id]));
         socket.leave(socket.room);
         delete users[socket.id];
         io.sockets.in(socket.room).emit('userLeft', socket.username, users);
         io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
     });
-});
 
+});
 

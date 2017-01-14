@@ -11,13 +11,14 @@ socket.on('refreshCurrentUsers', function(users){
     refreshCurrentUsers(users);
 });
 
-socket.on('joinedUser', function(users){
+socket.on('userJoined', function(username){
     clearJoinedUsers();
-    pushJoinedUsers(users, ' has joined the room <br/>');
+    pushUsersNotification(username, ' has joined the room <br/>');
 });
 
-socket.on('userLeft', function(users, users){
+socket.on('userLeft', function(username, users){
     clearJoinedUsers();
+    pushUsersNotification(username, ' has left the room <br/>');
 });
 
 
@@ -32,15 +33,9 @@ function refreshCurrentUsers(users){
     }
 }
 
-function pushJoinedUsers(users, message){
-    for(var properties in users){
-        for(var property in users[properties]){
-            if(property === 'name'){
-                var el = document.getElementById("joined");
-                el.innerHTML += users[properties][property] + message;
-            }
-        }
-    }
+function pushUsersNotification(username, message){
+    var el = document.getElementById("joined");
+    el.innerHTML += username + message;
 }
 
 function clearNewUsers(){
