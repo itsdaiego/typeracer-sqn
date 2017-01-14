@@ -2,6 +2,9 @@ var socket, roomname, ioRoom;
 var socket = io.connect('http://localhost:3000');
 var users = [];
 var currentSentence = "";
+var playerKeyStrokes = 0;
+var username;
+
 
 socket.on('enterRoom', function(roomname){
     console.log("ENTERED ROOM: " + roomname);
