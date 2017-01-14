@@ -38,9 +38,8 @@ socket.on('startGame', function(){
 });
 
 
-
 function startGame(){
-    listenKeyStrokes();
+    listenToKeyStrokes();
 }
 
 function checkInputValue(inputValue){
@@ -51,21 +50,19 @@ function checkInputValue(inputValue){
             return false;
         }
     }
-    // listOfWords.shift(); 
     return true;
 }
 
-function listenKeyStrokes(){
+function listenToKeyStrokes(){
     var el = document.getElementById("type-listener");
     el.addEventListener('keyup', function(event){
-        if(event.keyCode === 32){
-            if(this.value.trim() === listOfWords[0]){
-                listOfWords.shift();
-                el.value = '';
-            }
+        if(event.keyCode === 32 &&  (this.value.trim() === listOfWords[0]) ){
+            listOfWords.shift();
+            el.value = '';
             return false;
         }
         var evaluation = checkInputValue(this.value, listOfWords[0]);
+        cleanHighlightInput();
         highlightInput(evaluation);
     });
 }
@@ -84,6 +81,9 @@ function highlightInput(evaluation){
 
 }
 
+function cleanHighlightInput(){
+    var el = document.getElementById('type-listener').className = "";
+}
 
 function refreshCurrentUsers(users){
     for(var properties in users){
