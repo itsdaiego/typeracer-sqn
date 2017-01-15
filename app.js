@@ -49,7 +49,6 @@ io.sockets.on('connection', function (socket) {
     
     socket.on('userReady', function(){
         userReadyCounter++;
-        console.log(userReadyCounter)
         if(userReadyCounter === connectionCounter){
             var sentences = english.getEnglishSentences();
             io.sockets.in(socket.room).emit('startGame');
@@ -68,8 +67,11 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function(){
-        console.log("user left: " + JSON.stringify(users[socket.id]));
-        connectionCounter--;
+        if(users[socket.id]){
+            connectionCounter--;
+            userReadyCounter--;
+            console.log("Number of connections: " + connectionCounter);
+        }
         socket.leave(socket.room);
         delete users[socket.id];
         io.sockets.in(socket.room).emit('userLeft', socket.username, users);

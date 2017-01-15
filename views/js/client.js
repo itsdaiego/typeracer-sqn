@@ -128,5 +128,7 @@ function clearJoinedUsers(){
 }
 
 function userReady(){
+    var el = document.getElementById("start-button");
+    el.innerHTML = 'Waiting for other players...';
     socket.emit('userReady');
 }
