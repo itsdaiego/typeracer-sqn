@@ -3,7 +3,6 @@ var socket = io.connect('http://localhost:3000');
 var users = [];
 var currentSentence = "";
 var listOfWords = [];
-var playerKeyStrokes = 0;
 var username;
 
 
@@ -37,8 +36,8 @@ socket.on('startGame', function(){
     startGame();
 });
 
-socket.on('updateScore', function(updateData){
-    updateScore(updateData);
+socket.on('updateScore', function(scoreData){
+    updateScore(scoreData);
 });
 
 
@@ -57,30 +56,31 @@ function evaluateKeyStroke(){
         var evaluation = checkInputValue(this.value, listOfWords[0]);
         cleanHighlightInput();
         highlightInput(evaluation);
-        if(evaluation){
-            var updateData = {
-                username: username,
-                score: playerKeyStrokes++
-            };
-            socket.emit('sendPlayerScore', updateData);
+        if(evaluation  && event.keyCode !== 8){
+            socket.emit('sendPlayerScore', username);
         }
     });
 }
 
-function updateScore(updateData){
-    var el = document.getElementById(updateData.username);
-    el.innerHTML += " " + updateData.score;
+function updateScore(scoreData){
+    var el = document.getElementById(scoreData.username);
+    el.innerHTML = scoreData.username + " " + scoreData.score;
 }
 
 function checkInputValue(inputValue){
     var currentWord = listOfWords[0];
     var inputValueList = inputValue.split('');
-    for(var i=0; i < inputValueList.length; i++){
-        if(inputValueList[i] !== currentWord[i]){
-            return false;
+    if(inputValueList.length > 0){
+        for(var i=0; i < inputValueList.length; i++){
+            if(inputValueList[i] !== currentWord[i]){
+                return false;
+            }
         }
+        return true;
     }
-    return true;
+    else{
+        return false;
+    }
 }
 
 function pushSentenceToPlayer(sentence){
@@ -99,12 +99,6 @@ function highlightInput(evaluation){
 
 function cleanHighlightInput(){
     var el = document.getElementById('type-listener').className = "";
-}
-
-function updatePlayerKeyStrokes(){
-    playerKeyStrokes++;
-    var el = document.getElementById('username');
-    el.innerHtml = " " + playerKeyStrokes;
 }
 
 function refreshCurrentUsers(users){

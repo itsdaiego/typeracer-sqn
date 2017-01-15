@@ -27,6 +27,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('joinedRoom', function(roomData){
         socket.username = roomData.username;
         socket.room = roomData.roomname;
+        socket.score = 0;
         var user = {
             name: roomData.username,
             score: 0
@@ -47,8 +48,13 @@ io.sockets.on('connection', function (socket) {
         socket.emit('sentence', 'First sentence to be typed to client: ' + socket.id);
     }, 1000);
 
-    socket.on('sendPlayerScore', function(updateData){
-        io.sockets.in(socket.room).emit('updateScore', updateData);
+    socket.on('sendPlayerScore', function(username){
+        socket.score++;
+        var scoreData  = {
+            username: username,
+            score: socket.score
+        };
+        io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 
     socket.on('disconnect', function(){
