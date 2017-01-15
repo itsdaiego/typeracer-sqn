@@ -3,3 +3,7 @@
     background-color: #f15f5f;
     color: white;
 }
+button{
+    margin-top: 100px;
+    display: block;
+}

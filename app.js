@@ -24,10 +24,13 @@ app.get('/room/:roomname/user/:username', function(req, res){
 });
 
 var users = {};
+var userReadyCounter = 0;
+var connectionCounter = 0;
 io.sockets.on('connection', function (socket) {
     socket.on('joinedRoom', function(roomData){
         socket.username = roomData.username;
         socket.room = roomData.roomname;
+        connectionCounter++;
         socket.score = 0;
         var user = {
             name: roomData.username,
@@ -43,12 +46,17 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.to(socket.room).emit('userJoined', socket.username);
 
     });
+    
+    socket.on('userReady', function(){
+        userReadyCounter++;
+        console.log(userReadyCounter)
+        if(userReadyCounter === connectionCounter){
+            var sentences = english.getEnglishSentences();
+            io.sockets.in(socket.room).emit('startGame');
+            io.sockets.in(socket.room).emit('newSentence', sentences[4]);
+        }
+    })
 
-    setTimeout(function(){
-        var sentences = english.getEnglishSentences();
-        socket.emit('startGame');
-        socket.emit('sentence', sentences[0]);
-    }, 1000);
 
     socket.on('sendPlayerScore', function(username){
         socket.score++;
@@ -61,6 +69,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function(){
         console.log("user left: " + JSON.stringify(users[socket.id]));
+        connectionCounter--;
         socket.leave(socket.room);
         delete users[socket.id];
         io.sockets.in(socket.room).emit('userLeft', socket.username, users);

@@ -26,7 +26,7 @@ socket.on('userLeft', function(username, users){
 });
 
 
-socket.on('sentence', function(sentence){
+socket.on('newSentence', function(sentence){
     currentSentence = sentence;
     listOfWords = currentSentence.split(' ');
     pushSentenceToPlayer(sentence);
@@ -125,4 +125,8 @@ function clearNewUsers(){
 function clearJoinedUsers(){
     var el = document.getElementById("joined");
     el.innerHTML = '';
+}
+
+function userReady(){
+    socket.emit('userReady');
 }
