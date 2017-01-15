@@ -26,7 +26,7 @@ app.get('/room/:roomname/user/:username', function(req, res){
 var users = {};
 var userReadyCounter = 0;
 var connectionCounter = 0;
-var gameDuration = 1800; //3 minutes
+var gameDuration = 180; //3 minutes
 
 io.sockets.on('connection', function (socket) {
     socket.on('joinedRoom', function(roomData){

@@ -47,10 +47,6 @@ socket.on('timeRemaining', function(gameDuration){
 });
 
 function startGame(){
-    evaluateKeyStroke();
-}
-
-function evaluateKeyStroke(){
     var el = document.getElementById("type-listener");
     el.addEventListener('keyup', function(event){
         if(event.keyCode === 32 &&  (this.value.trim() === listOfWords[0]) ){
