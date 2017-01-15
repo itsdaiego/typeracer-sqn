@@ -51,6 +51,8 @@ function startGame(){
     el.addEventListener('keyup', function(event){
         if(event.keyCode === 32 &&  (this.value.trim() === listOfWords[0]) ){
             listOfWords.shift();
+            var newSentence = listOfWords.join().replace(/,/g, ' ');
+            pushSentenceToPlayer(newSentence); 
             el.value = '';
             return false;
         }
@@ -86,7 +88,7 @@ function checkInputValue(inputValue){
 
 function pushSentenceToPlayer(sentence){
     var el = document.getElementById("type-area");
-    el.innerHTML += sentence;
+    el.innerHTML = sentence;
 }
 
 function highlightInput(evaluation){
