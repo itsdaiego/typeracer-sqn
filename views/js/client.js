@@ -1,7 +1,7 @@
 var socket, roomname, ioRoom;
 var socket = io.connect('http://localhost:3000');
 var users = [];
-var currentSentence = "";
+var currentSentence = '';
 var listOfWords = [];
 var username;
 
@@ -51,7 +51,7 @@ socket.on('gameFinished', function(winner){
 });
 
 function startGame(){
-    var el = document.getElementById("type-listener");
+    var el = document.getElementById('type-listener');
     el.addEventListener('keyup', function(event){
         if(event.keyCode === 32 &&  (this.value.trim() === listOfWords[0]) ){
             updateSentence();
@@ -80,7 +80,7 @@ function updateSentence(){
 
 function updateScore(scoreData){
     var el = document.getElementById(scoreData.username);
-    el.innerHTML = scoreData.username + " " + scoreData.score;
+    el.innerHTML = scoreData.username + ' ' + scoreData.score;
 }
 
 function checkInputValue(inputValue){
@@ -100,21 +100,21 @@ function checkInputValue(inputValue){
 }
 
 function pushSentenceToPlayer(sentence){
-    var el = document.getElementById("type-area");
+    var el = document.getElementById('type-area');
     el.innerHTML = sentence;
 }
 
 function highlightInput(evaluation){
     var className = evaluation ? 'correct' : 'incorrect';
     var el = document.getElementById('type-listener');
-    if(!el.classList.contains("incorrect")){
+    if(!el.classList.contains('incorrect')){
         el.className +=  ' ' + className;
     }
 
 }
 
 function cleanHighlightInput(){
-    var el = document.getElementById('type-listener').className = "";
+    var el = document.getElementById('type-listener').className = '';
 }
 
 function refreshCurrentUsers(users){
@@ -122,36 +122,36 @@ function refreshCurrentUsers(users){
         for(var property in users[properties]){
             if(property === 'name'){
                 var el = document.getElementById('username');
-                el.innerHTML += "<p id='"+users[properties][property]+"'>" + users[properties][property] + '<p>';
+                el.innerHTML += '<p id=''+users[properties][property]+''>' + users[properties][property] + '<p>';
             }
         }
     }
 }
 
 function pushUsersNotification(username, message){
-    var el = document.getElementById("joined");
+    var el = document.getElementById('joined');
     el.innerHTML += username + message;
 }
 
 function clearNewUsers(){
     var el = document.getElementById('username');
-    el.innerHTML = "";
+    el.innerHTML = '';
 }
 
 function clearJoinedUsers(){
-    var el = document.getElementById("joined");
+    var el = document.getElementById('joined');
     el.innerHTML = '';
 }
 
 function userReady(){
-    var el = document.getElementById("start-button");
+    var el = document.getElementById('start-button');
     el.innerHTML = 'Waiting for other players...';
     socket.emit('userReady');
 }
 
 function showTimer(gameDuration){
     var el = document.getElementById('time-remaining');
-    el.innerHTML = "Time remaining: " + gameDuration + " seconds";
+    el.innerHTML = 'Time remaining: ' + gameDuration + ' seconds';
 }
 
 function hideStartButton(){

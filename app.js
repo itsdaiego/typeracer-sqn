@@ -65,7 +65,7 @@ io.sockets.on('connection', function (socket) {
                     socket.emit('gameFinished');
                 }
                 else{
-                    console.log("Game duration: " + gameDuration);
+                    console.log('Game duration: ' + gameDuration);
                     io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
                 }
             }, 1000);
@@ -91,7 +91,7 @@ io.sockets.on('connection', function (socket) {
         if(users[socket.id]){
             connectionCounter--;
             userReadyCounter--;
-            console.log("Number of connections: " + connectionCounter);
+            console.log('Number of connections: ' + connectionCounter);
             socket.leave(socket.room);
             delete users[socket.id];
             io.sockets.in(socket.room).emit('userLeft', socket.username, users);

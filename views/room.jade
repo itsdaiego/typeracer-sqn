@@ -2,8 +2,8 @@ doctype html
 head
     title Sala #{roomname}
 
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js")
-    script(type="text/javascript").
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js')
+    script(type='text/javascript').
         var socket = io.connect('http://localhost:3000');
         var roomData = {
             roomname: '#{roomname}',
@@ -13,7 +13,7 @@ head
             socket.emit('joinedRoom', roomData);
         })
 
-    script(src="../../../js/client.js")
+    script(src='../../../js/client.js')
     link(href='../../../css/style.css', rel='stylesheet')
 
 
@@ -25,11 +25,11 @@ head
 
       h2 Players:
 
-      div(class="player-row" id="username")
+      div(class='player-row' id='username')
 
       h2#type-area
-      input(type="text", placeholder="type here", id="type-listener")
+      input(type='text', placeholder='type here', id='type-listener')
 
-      button(onclick="userReady()" id="start-button") Start
+      button(onclick='userReady()' id='start-button') Start
 
-      p(id="time-remaining")
+      p(id='time-remaining')
