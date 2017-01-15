@@ -26,6 +26,8 @@ app.get('/room/:roomname/user/:username', function(req, res){
 var users = {};
 var userReadyCounter = 0;
 var connectionCounter = 0;
+var gameDuration = 1800; //3 minutes
+
 io.sockets.on('connection', function (socket) {
     socket.on('joinedRoom', function(roomData){
         socket.username = roomData.username;
@@ -53,6 +55,12 @@ io.sockets.on('connection', function (socket) {
             var sentences = english.getEnglishSentences();
             io.sockets.in(socket.room).emit('startGame');
             io.sockets.in(socket.room).emit('newSentence', sentences[4]);
+            io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
+            setInterval(function(){
+                gameDuration--;
+                console.log("Game duration: " + gameDuration);
+                io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
+            }, 1000);
         }
     })
 
@@ -66,16 +74,18 @@ io.sockets.on('connection', function (socket) {
         io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 
+    
+
     socket.on('disconnect', function(){
         if(users[socket.id]){
             connectionCounter--;
             userReadyCounter--;
             console.log("Number of connections: " + connectionCounter);
+            socket.leave(socket.room);
+            delete users[socket.id];
+            io.sockets.in(socket.room).emit('userLeft', socket.username, users);
+            io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
         }
-        socket.leave(socket.room);
-        delete users[socket.id];
-        io.sockets.in(socket.room).emit('userLeft', socket.username, users);
-        io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
     });
 
 });

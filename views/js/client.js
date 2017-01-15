@@ -34,12 +34,17 @@ socket.on('newSentence', function(sentence){
 
 socket.on('startGame', function(){
     startGame();
+    showTimer();
+    hideStartButton();
 });
 
 socket.on('updateScore', function(scoreData){
     updateScore(scoreData);
 });
 
+socket.on('timeRemaining', function(gameDuration){
+    showTimer(gameDuration);
+});
 
 function startGame(){
     evaluateKeyStroke();
@@ -131,4 +136,14 @@ function userReady(){
     var el = document.getElementById("start-button");
     el.innerHTML = 'Waiting for other players...';
     socket.emit('userReady');
+}
+
+function showTimer(gameDuration){
+    var el = document.getElementById('time-remaining');
+    el.innerHTML = "Time remaining: " + gameDuration + " seconds";
+}
+
+function hideStartButton(){
+    var el = document.getElementById('start-button');
+    el.style.display = 'none';
 }
