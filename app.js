@@ -7,6 +7,7 @@ var server = app.listen(3000);
 var io = socket(server);
 
 var english = require('./public/english.js');
+
 app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/views'));
 
@@ -37,7 +38,7 @@ io.sockets.on('connection', function (socket) {
         connectionCounter++;
         socket.score = 0;
         var user = {
-            name: roomData.username,
+            name: socket.username,
             score: 0
         };
 
@@ -60,8 +61,13 @@ io.sockets.on('connection', function (socket) {
             io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
             setInterval(function(){
                 gameDuration--;
-                console.log("Game duration: " + gameDuration);
-                io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
+                if(gameDuration === 0){
+                    socket.emit('gameFinished');
+                }
+                else{
+                    console.log("Game duration: " + gameDuration);
+                    io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
+                }
             }, 1000);
         }
     })

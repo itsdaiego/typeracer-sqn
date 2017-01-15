@@ -46,6 +46,10 @@ socket.on('timeRemaining', function(gameDuration){
     showTimer(gameDuration);
 });
 
+socket.on('gameFinished', function(winner){
+    alert(username +  ' is the winner');
+});
+
 function startGame(){
     var el = document.getElementById("type-listener");
     el.addEventListener('keyup', function(event){
