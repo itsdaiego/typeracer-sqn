@@ -6,6 +6,7 @@ var server = app.listen(3000);
 
 var io = socket(server);
 
+var english = require('./public/english.js');
 app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/views'));
 
@@ -44,8 +45,9 @@ io.sockets.on('connection', function (socket) {
     });
 
     setTimeout(function(){
+        var sentences = english.getEnglishSentences();
         socket.emit('startGame');
-        socket.emit('sentence', 'First sentence to be typed to client: ' + socket.id);
+        socket.emit('sentence', sentences[0]);
     }, 1000);
 
     socket.on('sendPlayerScore', function(username){
