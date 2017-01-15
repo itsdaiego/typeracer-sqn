@@ -47,6 +47,10 @@ io.sockets.on('connection', function (socket) {
         socket.emit('sentence', 'First sentence to be typed to client: ' + socket.id);
     }, 1000);
 
+    socket.on('sendPlayerScore', function(updateData){
+        io.sockets.in(socket.room).emit('updateScore', updateData);
+    });
+
     socket.on('disconnect', function(){
         console.log("user left: " + JSON.stringify(users[socket.id]));
         socket.leave(socket.room);

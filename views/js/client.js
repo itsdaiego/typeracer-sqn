@@ -37,6 +37,10 @@ socket.on('startGame', function(){
     startGame();
 });
 
+socket.on('updateScore', function(updateData){
+    updateScore(updateData);
+});
+
 
 function startGame(){
     evaluateKeyStroke();
@@ -53,8 +57,19 @@ function evaluateKeyStroke(){
         var evaluation = checkInputValue(this.value, listOfWords[0]);
         cleanHighlightInput();
         highlightInput(evaluation);
-        updatePlayerKeyStrokes(evaluation);
+        if(evaluation){
+            var updateData = {
+                username: username,
+                score: playerKeyStrokes++
+            };
+            socket.emit('sendPlayerScore', updateData);
+        }
     });
+}
+
+function updateScore(updateData){
+    var el = document.getElementById(updateData.username);
+    el.innerHTML += " " + updateData.score;
 }
 
 function checkInputValue(inputValue){
@@ -86,20 +101,18 @@ function cleanHighlightInput(){
     var el = document.getElementById('type-listener').className = "";
 }
 
-function updatePlayerKeyStrokes(evaluation){
-    if(evaluation){
-        playerKeyStrokes++;
-        var el = document.getElementById(username);
-        el.innerHtml = " " + playerKeyStrokes;
-    }
+function updatePlayerKeyStrokes(){
+    playerKeyStrokes++;
+    var el = document.getElementById('username');
+    el.innerHtml = " " + playerKeyStrokes;
 }
 
 function refreshCurrentUsers(users){
     for(var properties in users){
         for(var property in users[properties]){
             if(property === 'name'){
-                var el = document.getElementById(username);
-                el.innerHTML += "<p id='"+username+"'>" + users[properties][property] + '<p>';
+                var el = document.getElementById('username');
+                el.innerHTML += "<p id='"+users[properties][property]+"'>" + users[properties][property] + '<p>';
             }
         }
     }
@@ -111,7 +124,7 @@ function pushUsersNotification(username, message){
 }
 
 function clearNewUsers(){
-    var el = document.getElementById(username);
+    var el = document.getElementById('username');
     el.innerHTML = "";
 }
 
