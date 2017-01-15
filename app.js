@@ -27,11 +27,13 @@ var users = {};
 var userReadyCounter = 0;
 var connectionCounter = 0;
 var gameDuration = 180; //3 minutes
+var sentences = english.getSampleSentences();
 
 io.sockets.on('connection', function (socket) {
     socket.on('joinedRoom', function(roomData){
         socket.username = roomData.username;
         socket.room = roomData.roomname;
+        socket.sentenceCounter = 0;
         connectionCounter++;
         socket.score = 0;
         var user = {
@@ -52,9 +54,9 @@ io.sockets.on('connection', function (socket) {
     socket.on('userReady', function(){
         userReadyCounter++;
         if(userReadyCounter === connectionCounter){
-            var sentences = english.getEnglishSentences();
             io.sockets.in(socket.room).emit('startGame');
-            io.sockets.in(socket.room).emit('newSentence', sentences[4]);
+            io.sockets.in(socket.room).emit('newSentence', sentences[socket.sentenceCounter]);
+
             io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
             setInterval(function(){
                 gameDuration--;
@@ -74,7 +76,10 @@ io.sockets.on('connection', function (socket) {
         io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 
-    
+    socket.on('sentenceFinished', function(){
+        socket.sentenceCounter++;
+        socket.emit('newSentence', sentences[socket.sentenceCounter]);
+    });
 
     socket.on('disconnect', function(){
         if(users[socket.id]){

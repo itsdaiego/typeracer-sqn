@@ -50,9 +50,7 @@ function startGame(){
     var el = document.getElementById("type-listener");
     el.addEventListener('keyup', function(event){
         if(event.keyCode === 32 &&  (this.value.trim() === listOfWords[0]) ){
-            listOfWords.shift();
-            var newSentence = listOfWords.join().replace(/,/g, ' ');
-            pushSentenceToPlayer(newSentence); 
+            updateSentence();
             el.value = '';
             return false;
         }
@@ -63,6 +61,17 @@ function startGame(){
             socket.emit('sendPlayerScore', username);
         }
     });
+}
+
+function updateSentence(){
+    listOfWords.shift();
+    if(listOfWords.length === 0){
+        socket.emit('sentenceFinished')
+    }
+    else{
+        var newSentence = listOfWords.join().replace(/,/g, ' ');
+        pushSentenceToPlayer(newSentence); 
+    }
 }
 
 function updateScore(scoreData){

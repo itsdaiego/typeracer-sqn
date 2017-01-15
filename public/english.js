@@ -11,5 +11,13 @@ module.exports =  {
             "We’ve fought two wars since 9/11. We got help from tens of thousands of Iraqis and Afghans—some were targeted or killed because they helped us. We owe these people. We’ve passed laws that say so. So why has it been so hard for us to get many of them to safety.",
             "WELCOME TO NIGHT VALE is a twice-monthly podcast in the style of community updates for the small desert town of Night Vale, featuring local weather, news, announcements from the Sheriff's Secret Police, mysterious lights in the night sky, dark hooded figures with unknowable powers, and cultural events.",
         ];
+    },
+
+    getSampleSentences: function(){
+        return [
+            "sentence test1",
+            "sentence test2",
+            "sentence test3"
+        ]
     }
 }
