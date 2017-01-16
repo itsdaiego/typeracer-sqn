@@ -27,8 +27,8 @@ app.get('/room/:roomname/user/:username', function(req, res){
 var users = {};
 var userReadyCounter = 0;
 var connectionCounter = 0;
-var gameDuration = 180; //3 minutes
-var sentences = english.getSampleSentences();
+var gameDuration = 0;
+var sentences = english.getEnglishSentences();
 var highestScore = 0;
 
 io.sockets.on('connection', function (socket) {
@@ -56,13 +56,13 @@ io.sockets.on('connection', function (socket) {
     socket.on('userReady', function(){
         userReadyCounter++;
         if(userReadyCounter === connectionCounter){
+            gameDuration = 180
             io.sockets.in(socket.room).emit('startGame');
             io.sockets.in(socket.room).emit('newSentence', sentences[socket.sentenceCounter]);
 
             io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
             var intervalId = setInterval(function(){
                gameDuration--;
-                console.log(io.sockets.adapter);
                 if(gameDuration <= 0){
                     clearInterval(intervalId);
                     socket.emit('gameFinished');
@@ -92,8 +92,8 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function(){
         if(users[socket.id]){
-            connectionCounter--;
-            userReadyCounter--;
+            connectionCounter = connectionCounter > 0 ? connectionCounter-- : connectionCounter;
+            userReadyCounter = userReadyCounter > 0 ? userReadyCounter-- : userReadyCounter;
             console.log('Number of connections: ' + connectionCounter);
             socket.leave(socket.room);
             delete users[socket.id];
