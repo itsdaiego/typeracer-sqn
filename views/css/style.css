@@ -1,9 +1,38 @@
+body{
+    background-color: #f5f5f5;
+    text-align: center;
+}
+p, span{
+    font-family: 'Arial', 'Helvetica';
+    color: #383838;
+    font-size: 24px;
+}
+
+h1, h2, h3{
+    font-family: 'Arial', 'Helvetica';
+    color: #383838;
+    font-size: 35px;
+}
+
+
 .incorrect{
     border: #f15f5f;
     background-color: #f15f5f;
     color: white;
 }
+input{
+    border: none;
+    width: 210px;
+    height: 30px;
+    font-size: 20px;
+}
 button{
+    margin: 0 auto;
+    width: 150px;
+    font-size: 15px;
+    border: 1px solid #383838;
+    background: transparent;
     margin-top: 20px;
     display: block;
 }
+

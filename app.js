@@ -29,6 +29,7 @@ var userReadyCounter = 0;
 var connectionCounter = 0;
 var gameDuration = 180; //3 minutes
 var sentences = english.getSampleSentences();
+var highestScore = 0;
 
 io.sockets.on('connection', function (socket) {
     socket.on('joinedRoom', function(roomData){
@@ -59,9 +60,11 @@ io.sockets.on('connection', function (socket) {
             io.sockets.in(socket.room).emit('newSentence', sentences[socket.sentenceCounter]);
 
             io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
-            setInterval(function(){
-                gameDuration--;
-                if(gameDuration === 0){
+            var intervalId = setInterval(function(){
+               gameDuration--;
+                console.log(io.sockets.adapter);
+                if(gameDuration <= 0){
+                    clearInterval(intervalId);
                     socket.emit('gameFinished');
                 }
                 else{

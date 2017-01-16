@@ -122,7 +122,7 @@ function refreshCurrentUsers(users){
         for(var property in users[properties]){
             if(property === 'name'){
                 var el = document.getElementById('username');
-                el.innerHTML += '<p id=''+users[properties][property]+''>' + users[properties][property] + '<p>';
+                el.innerHTML += '<p id=\''+users[properties][property]+'\'>' + users[properties][property] + '<p>';
             }
         }
     }
