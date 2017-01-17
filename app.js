@@ -26,7 +26,6 @@ app.get('/room/:roomname/user/:username', function(req, res){
 
 var users = {};
 var userReadyCounter = 0;
-var connectionCounter = 0;
 var gameDuration = 0;
 var sentences = english.getEnglishSentences();
 var highestScore = 0;
@@ -39,7 +38,6 @@ io.sockets.on('connection', function (socket) {
         connectionData.username = roomData.username;
         connectionData.room = roomData.roomname;
         connectionData.sentenceCounter = 0;
-        connectionCounter++;
         connectionData.score = 0;
         var user = {
             name: connectionData.username,
@@ -59,13 +57,12 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('userReady', function(roomData){
-        console.log("ROOMDATA: " + connectionData.room)
-        console.log("ROOMDATA: " + JSON.stringify(roomData))
+        console.log("users ready: " + userReadyCounter); 
+        console.log("rooms length" + io.sockets.adapter.rooms[connectionData.room].length); 
         if(roomData.roomname === connectionData.room){
             userReadyCounter++;
-            console.log(io.sockets.adapter.rooms[connectionData.room]);
         }
-        if(userReadyCounter === connectionCounter){
+        if(userReadyCounter === io.sockets.adapter.rooms[connectionData.room].length){
             io.sockets.in(connectionData.room).emit('startGame');
             io.sockets.in(connectionData.room).emit('newSentence', sentences[connectionData.sentenceCounter]);
 
@@ -100,9 +97,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function(){
         if(users[socket.id]){
-            connectionCounter--;
-            userReadyCounter--;
-            console.log('Number of connections: ' + connectionCounter);
+            userReadyCounter = userReadyCounter > 0 ? userReadyCounter-- : userReadyCounter;
             socket.leave(connectionData.room);
             delete users[socket.id];
             io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, users);
