@@ -10,7 +10,7 @@ head
                 roomname: '#{roomname}',
                 username: '#{username}'
             }
-            socket.emit('joinedRoom', roomData);
+            socket.send(roomData);
         })
 
     script(src="../../../js/client.js")

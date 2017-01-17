@@ -34,7 +34,7 @@ var gameDuration = 180;
 
 io.sockets.on('connection', function (socket) {
     connectionData = {};
-    socket.on('joinedUser', function(roomData){
+    socket.on('message', function(roomData){
         console.log("ROOM: " + JSON.stringify(roomData));
         connectionData.username = roomData.username;
         connectionData.room = roomData.roomname;
