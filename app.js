@@ -33,7 +33,7 @@ var highestScore = 0;
 var gameDuration = 180;
 
 io.sockets.on('connection', function (socket) {
-    connectionData = {};
+    var connectionData = {};
     socket.on('message', function(roomData){
         console.log("ROOM: " + JSON.stringify(roomData));
         connectionData.username = roomData.username;
@@ -59,9 +59,11 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('userReady', function(roomData){
+        console.log("ROOMDATA: " + connectionData.room)
+        console.log("ROOMDATA: " + JSON.stringify(roomData))
         if(roomData.roomname === connectionData.room){
             userReadyCounter++;
-            // console.log(io.sockets.adapter.rooms[connectionData.room]);
+            console.log(io.sockets.adapter.rooms[connectionData.room]);
         }
         if(userReadyCounter === connectionCounter){
             io.sockets.in(connectionData.room).emit('startGame');

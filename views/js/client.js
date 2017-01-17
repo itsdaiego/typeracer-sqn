@@ -4,10 +4,11 @@ var users = [];
 var currentSentence = '';
 var listOfWords = [];
 var username;
-var roomData = {};
+var roomData;
 
-socket.on('userInfo', function(data){
-    username = data.username;
+socket.on('userInfo', function(userInfo){
+    username = userInfo.username;
+    roomData = userInfo;
 });
 
 socket.on('refreshCurrentUsers', function(users){
@@ -16,7 +17,6 @@ socket.on('refreshCurrentUsers', function(users){
 });
 
 socket.on('userJoined', function(roomData){
-    roomData = roomData;
     clearJoinedUsers();
     pushUsersNotification(username, ' has joined the room <br/>');
 });
