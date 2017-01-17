@@ -30,37 +30,44 @@ var connectionCounter = 0;
 var gameDuration = 0;
 var sentences = english.getEnglishSentences();
 var highestScore = 0;
+var gameDuration = 180;
 
 io.sockets.on('connection', function (socket) {
-    socket.on('joinedRoom', function(roomData){
-        socket.username = roomData.username;
-        socket.room = roomData.roomname;
-        socket.sentenceCounter = 0;
+    connectionData = {};
+    socket.on('joinedUser', function(roomData){
+        console.log("ROOM: " + JSON.stringify(roomData));
+        connectionData.username = roomData.username;
+        connectionData.room = roomData.roomname;
+        connectionData.sentenceCounter = 0;
         connectionCounter++;
-        socket.score = 0;
+        connectionData.score = 0;
         var user = {
-            name: socket.username,
+            name: connectionData.username,
             score: 0
         };
 
         socket.emit('userInfo', roomData);
 
         users[socket.id] = user;
-
-        socket.join(socket.room);
-        io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
-        socket.broadcast.to(socket.room).emit('userJoined', socket.username);
+        socket.join(connectionData.room);
+        io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
+        socket.broadcast.to(connectionData.room).emit('userJoined', {
+            username: connectionData.username,
+            roomname: connectionData.roomname
+        });
 
     });
     
-    socket.on('userReady', function(){
-        userReadyCounter++;
+    socket.on('userReady', function(roomData){
+        if(roomData.roomname === connectionData.room){
+            userReadyCounter++;
+            // console.log(io.sockets.adapter.rooms[connectionData.room]);
+        }
         if(userReadyCounter === connectionCounter){
-            gameDuration = 180
-            io.sockets.in(socket.room).emit('startGame');
-            io.sockets.in(socket.room).emit('newSentence', sentences[socket.sentenceCounter]);
+            io.sockets.in(connectionData.room).emit('startGame');
+            io.sockets.in(connectionData.room).emit('newSentence', sentences[connectionData.sentenceCounter]);
 
-            io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
+            io.sockets.in(connectionData.room).emit('timeRemaining', gameDuration);
             var intervalId = setInterval(function(){
                gameDuration--;
                 if(gameDuration <= 0){
@@ -68,37 +75,36 @@ io.sockets.on('connection', function (socket) {
                     socket.emit('gameFinished');
                 }
                 else{
-                    console.log('Game duration: ' + gameDuration);
-                    io.sockets.in(socket.room).emit('timeRemaining', gameDuration);
+                    io.sockets.in(connectionData.room).emit('timeRemaining', gameDuration);
                 }
             }, 1000);
         }
-    })
+    });
 
 
     socket.on('sendPlayerScore', function(username){
-        socket.score++;
+        connectionData.score++;
         var scoreData  = {
             username: username,
-            score: socket.score
+            score: connectionData.score
         };
-        io.sockets.in(socket.room).emit('updateScore', scoreData);
+        io.sockets.in(connectionData.room).emit('updateScore', scoreData);
     });
 
     socket.on('sentenceFinished', function(){
-        socket.sentenceCounter++;
-        socket.emit('newSentence', sentences[socket.sentenceCounter]);
+        connectionData.sentenceCounter++;
+        socket.emit('newSentence', sentences[connectionData.sentenceCounter]);
     });
 
     socket.on('disconnect', function(){
         if(users[socket.id]){
-            connectionCounter = connectionCounter > 0 ? connectionCounter-- : connectionCounter;
-            userReadyCounter = userReadyCounter > 0 ? userReadyCounter-- : userReadyCounter;
+            connectionCounter--;
+            userReadyCounter--;
             console.log('Number of connections: ' + connectionCounter);
-            socket.leave(socket.room);
+            socket.leave(connectionData.room);
             delete users[socket.id];
-            io.sockets.in(socket.room).emit('userLeft', socket.username, users);
-            io.sockets.in(socket.room).emit('refreshCurrentUsers', users);
+            io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, users);
+            io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
         }
     });
 

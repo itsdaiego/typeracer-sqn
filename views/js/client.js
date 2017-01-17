@@ -4,7 +4,7 @@ var users = [];
 var currentSentence = '';
 var listOfWords = [];
 var username;
-
+var roomData = {};
 
 socket.on('userInfo', function(data){
     username = data.username;
@@ -15,7 +15,8 @@ socket.on('refreshCurrentUsers', function(users){
     refreshCurrentUsers(users);
 });
 
-socket.on('userJoined', function(username){
+socket.on('userJoined', function(roomData){
+    roomData = roomData;
     clearJoinedUsers();
     pushUsersNotification(username, ' has joined the room <br/>');
 });
@@ -146,7 +147,7 @@ function clearJoinedUsers(){
 function userReady(){
     var el = document.getElementById('start-button');
     el.innerHTML = 'Waiting for other players...';
-    socket.emit('userReady');
+    socket.emit('userReady', roomData);
 }
 
 function showTimer(gameDuration){
