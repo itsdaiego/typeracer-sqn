@@ -47,10 +47,9 @@ socket.on('timeRemaining', function(gameDuration){
     showTimer(gameDuration);
 });
 
-socket.on('gameFinished', function(winner){
-    alert(username +  ' is the winner');
+socket.on('gameFinished', function(scoreData){
+    alert(scoreData.username +  ' is the winner!!! ');
 });
-
 function startGame(){
     var el = document.getElementById('type-listener');
     el.addEventListener('keyup', function(event){
@@ -147,6 +146,7 @@ function clearJoinedUsers(){
 function userReady(){
     var el = document.getElementById('start-button');
     el.innerHTML = 'Waiting for other players...';
+    el.disabled = true;
     socket.emit('userReady', roomData);
 }
 

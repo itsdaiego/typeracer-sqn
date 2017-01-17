@@ -7,6 +7,7 @@ var server = app.listen(3000);
 var io = socket(server);
 
 var english = require('./public/english.js');
+var engine = require('./models/engine.js');
 
 app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/views'));
@@ -29,7 +30,7 @@ var userReadyCounter = 0;
 var gameDuration = 0;
 var sentences = english.getEnglishSentences();
 var highestScore = 0;
-var gameDuration = 180;
+var gameDuration = 20;
 
 io.sockets.on('connection', function (socket) {
     var connectionData = {};
@@ -62,7 +63,7 @@ io.sockets.on('connection', function (socket) {
         if(roomData.roomname === connectionData.room){
             userReadyCounter++;
         }
-        if(userReadyCounter === io.sockets.adapter.rooms[connectionData.room].length){
+        if(userReadyCounter == io.sockets.adapter.rooms[connectionData.room].length){
             io.sockets.in(connectionData.room).emit('startGame');
             io.sockets.in(connectionData.room).emit('newSentence', sentences[connectionData.sentenceCounter]);
 
@@ -71,7 +72,8 @@ io.sockets.on('connection', function (socket) {
                gameDuration--;
                 if(gameDuration <= 0){
                     clearInterval(intervalId);
-                    socket.emit('gameFinished');
+                    var scoreData = engine.getCurrentWinner();
+                    socket.emit('gameFinished', scoreData);
                 }
                 else{
                     io.sockets.in(connectionData.room).emit('timeRemaining', gameDuration);
@@ -83,10 +85,13 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('sendPlayerScore', function(username){
         connectionData.score++;
+        
         var scoreData  = {
             username: username,
             score: connectionData.score
         };
+
+        engine.setCurrentWinner(scoreData);
         io.sockets.in(connectionData.room).emit('updateScore', scoreData);
     });
 
@@ -96,13 +101,12 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function(){
-        if(users[socket.id]){
-            userReadyCounter = userReadyCounter > 0 ? userReadyCounter-- : userReadyCounter;
-            socket.leave(connectionData.room);
-            delete users[socket.id];
-            io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, users);
-            io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
-        }
+        userReadyCounter = userReadyCounter >= 0 ? userReadyCounter-- : userReadyCounter;
+        console.log("users ready --: " + userReadyCounter);
+        socket.leave(connectionData.room);
+        delete users[socket.id];
+        io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, users);
+        io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
     });
 
 });
