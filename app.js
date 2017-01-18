@@ -67,17 +67,17 @@ io.sockets.on('connection', function (socket) {
             io.sockets.in(connectionData.room).emit('startGame');
             io.sockets.in(connectionData.room).emit('newSentence', sentences[connectionData.sentenceCounter]);
 
-            io.sockets.in(connectionData.room).emit('timeRemaining', gameDuration);
-            var gameDuration = 20;
+            io.sockets.in(connectionData.room).emit('timeRemaining', currentRoom.gameDuration);
+            currentRoom.gameDuration = 20;
             var intervalId = setInterval(function(){
-               gameDuration--;
-                if(gameDuration <= 0){
+               currentRoom.gameDuration--;
+                if(currentRoom.gameDuration <= 0){
                     clearInterval(intervalId);
                     var scoreData = engine.getCurrentWinner();
                     socket.emit('gameFinished', scoreData);
                 }
                 else{
-                    io.sockets.in(connectionData.room).emit('timeRemaining', gameDuration);
+                    io.sockets.in(connectionData.room).emit('timeRemaining', currentRoom.gameDuration);
                 }
             }, 1000);
         }
