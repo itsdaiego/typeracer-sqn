@@ -30,36 +30,21 @@ var sentences = english.getEnglishSentences();
 var highestScore = 0;
 
 io.sockets.on('connection', function (socket) {
-    var connectionData = {};
     var currentRoom;
     socket.on('message', function(roomData){
-        connectionData.username = roomData.username;
-        connectionData.room = roomData.roomname;
-        connectionData.sentenceCounter = 0;
-        connectionData.score = 0;
-        var user = {
-            name: connectionData.username,
-            score: 0
-        };
+        engine.setConnectionProperties(socket, currentRoom, roomData);
 
         socket.emit('userInfo', roomData);
-
-        socket.join(connectionData.room);
+        socket.join(socket.room);
 
 
         currentRoom = io.sockets.adapter.rooms[roomData.roomname];
-        if(!currentRoom.users){
-            currentRoom.users = {};
-        }
-        currentRoom.usersReady = 0;
-        currentRoom.currentWinner = 0;
-        currentRoom.gameDuration = 5;
-        currentRoom.users[socket.id] = user;
+        engine.setCurrentRoomProperties(currentRoom, socket);
 
-        io.sockets.in(connectionData.room).emit('refreshCurrentUsers', currentRoom.users);
-        socket.broadcast.to(connectionData.room).emit('userJoined', {
-            username: connectionData.username,
-            roomname: connectionData.roomname
+        io.sockets.in(socket.room).emit('refreshCurrentUsers', currentRoom.users);
+        socket.broadcast.to(socket.room).emit('userJoined', {
+            username: socket.username,
+            roomname: socket.roomname
         });
 
     });
@@ -67,10 +52,10 @@ io.sockets.on('connection', function (socket) {
     socket.on('userReady', function(roomData){
         currentRoom.usersReady++;
         if(currentRoom.usersReady == currentRoom.length){
-            io.sockets.in(connectionData.room).emit('startGame');
-            io.sockets.in(connectionData.room).emit('newSentence', sentences[connectionData.sentenceCounter]);
+            io.sockets.in(socket.room).emit('startGame');
+            io.sockets.in(socket.room).emit('newSentence', sentences[socket.sentenceCounter]);
 
-            io.sockets.in(connectionData.room).emit('timeRemaining', currentRoom.gameDuration);
+            io.sockets.in(socket.room).emit('timeRemaining', currentRoom.gameDuration);
             var intervalId = setInterval(function(){
                currentRoom.gameDuration--;
                 if(currentRoom.gameDuration <= 0){
@@ -78,7 +63,7 @@ io.sockets.on('connection', function (socket) {
                     socket.emit('gameFinished', currentRoom.currentWinner);
                 }
                 else{
-                    io.sockets.in(connectionData.room).emit('timeRemaining', currentRoom.gameDuration);
+                    io.sockets.in(socket.room).emit('timeRemaining', currentRoom.gameDuration);
                 }
             }, 1000);
         }
@@ -86,29 +71,26 @@ io.sockets.on('connection', function (socket) {
 
 
     socket.on('sendPlayerScore', function(username){
-        connectionData.score++;
-        
         var scoreData  = {
             username: username,
-            score: connectionData.score
+            score: socket.score
         };
-
-        currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner ? scoreData : currentRoom.currentWinner;
-        io.sockets.in(connectionData.room).emit('updateScore', scoreData);
+        engine.increasePlayerScore(socket, currentRoom, scoreData);
+        io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 
     socket.on('sentenceFinished', function(){
-        connectionData.sentenceCounter++;
-        socket.emit('newSentence', sentences[connectionData.sentenceCounter]);
+        socket.sentenceCounter++;
+        socket.emit('newSentence', sentences[socket.sentenceCounter]);
     });
 
     socket.on('disconnect', function(){
         if(socket.id && currentRoom){
             userReadyCounter = userReadyCounter >= 0 ? userReadyCounter-- : userReadyCounter;
-            socket.leave(connectionData.room);
+            socket.leave(socket.room);
             delete currentRoom.users[socket.id];
-            io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, currentRoom.users);
-            io.sockets.in(connectionData.room).emit('refreshCurrentUsers', currentRoom.users);
+            io.sockets.in(socket.room).emit('userLeft', socket.username, currentRoom.users);
+            io.sockets.in(socket.room).emit('refreshCurrentUsers', currentRoom.users);
 
         }
     });
