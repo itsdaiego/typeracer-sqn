@@ -52,6 +52,8 @@ io.sockets.on('connection', function (socket) {
 
         currentRoom = io.sockets.adapter.rooms[roomData.roomname];
         currentRoom.usersReady = 0;
+        currentRoom.currentWinner = 0;
+        currentRoom.gameDuration = 5;
 
         io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
         socket.broadcast.to(connectionData.room).emit('userJoined', {
@@ -68,13 +70,12 @@ io.sockets.on('connection', function (socket) {
             io.sockets.in(connectionData.room).emit('newSentence', sentences[connectionData.sentenceCounter]);
 
             io.sockets.in(connectionData.room).emit('timeRemaining', currentRoom.gameDuration);
-            currentRoom.gameDuration = 20;
             var intervalId = setInterval(function(){
                currentRoom.gameDuration--;
                 if(currentRoom.gameDuration <= 0){
                     clearInterval(intervalId);
-                    var scoreData = engine.getCurrentWinner();
-                    socket.emit('gameFinished', scoreData);
+                    console.log(currentRoom.currentWinner);
+                    socket.emit('gameFinished', currentRoom.currentWinner);
                 }
                 else{
                     io.sockets.in(connectionData.room).emit('timeRemaining', currentRoom.gameDuration);
@@ -92,7 +93,7 @@ io.sockets.on('connection', function (socket) {
             score: connectionData.score
         };
 
-        engine.setCurrentWinner(scoreData);
+        currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner ? scoreData : currentRoom.currentWinner;
         io.sockets.in(connectionData.room).emit('updateScore', scoreData);
     });
 
