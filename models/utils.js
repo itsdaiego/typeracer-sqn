@@ -22,8 +22,7 @@ module.exports = {
         currentRoom.gameDuration = 5;
         currentRoom.users[socket] = this.setNewUser(socket.username);
     },
-    increasePlayerScore: function(socket, currentRoom, scoreData){
-        socket.score++;
+    setCurrentWinner: function(socket, currentRoom, scoreData){
 
         currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner ? scoreData : currentRoom.currentWinner;
 

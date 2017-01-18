@@ -7,7 +7,7 @@ var server = app.listen(3000);
 var io = socket(server);
 
 var english = require('./public/english.js');
-var engine = require('./models/engine.js');
+var utils = require('./models/utils.js');
 
 app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/views'));
@@ -32,14 +32,14 @@ var highestScore = 0;
 io.sockets.on('connection', function (socket) {
     var currentRoom;
     socket.on('message', function(roomData){
-        engine.setConnectionProperties(socket, currentRoom, roomData);
+        utils.setConnectionProperties(socket, currentRoom, roomData);
 
         socket.emit('userInfo', roomData);
         socket.join(socket.room);
 
 
         currentRoom = io.sockets.adapter.rooms[roomData.roomname];
-        engine.setCurrentRoomProperties(currentRoom, socket);
+        utils.setCurrentRoomProperties(currentRoom, socket);
 
         io.sockets.in(socket.room).emit('refreshCurrentUsers', currentRoom.users);
         socket.broadcast.to(socket.room).emit('userJoined', {
@@ -75,7 +75,8 @@ io.sockets.on('connection', function (socket) {
             username: username,
             score: socket.score
         };
-        engine.increasePlayerScore(socket, currentRoom, scoreData);
+        socket.score++;
+        utils.setCurrentWinner(socket, currentRoom, scoreData);
         io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 
