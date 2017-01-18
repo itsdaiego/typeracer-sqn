@@ -25,7 +25,6 @@ app.get('/room/:roomname/user/:username', function(req, res){
     res.render('room', room);
 });
 
-var users = {};
 var userReadyCounter = 0;
 var sentences = english.getEnglishSentences();
 var highestScore = 0;
@@ -48,14 +47,17 @@ io.sockets.on('connection', function (socket) {
 
         socket.join(connectionData.room);
 
-        users[socket.id] = user;
 
         currentRoom = io.sockets.adapter.rooms[roomData.roomname];
+        if(!currentRoom.users){
+            currentRoom.users = {};
+        }
         currentRoom.usersReady = 0;
         currentRoom.currentWinner = 0;
         currentRoom.gameDuration = 5;
+        currentRoom.users[socket.id] = user;
 
-        io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
+        io.sockets.in(connectionData.room).emit('refreshCurrentUsers', currentRoom.users);
         socket.broadcast.to(connectionData.room).emit('userJoined', {
             username: connectionData.username,
             roomname: connectionData.roomname
@@ -103,12 +105,15 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function(){
-        userReadyCounter = userReadyCounter >= 0 ? userReadyCounter-- : userReadyCounter;
-        console.log("users ready --: " + userReadyCounter);
-        socket.leave(connectionData.room);
-        delete users[socket.id];
-        io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, users);
-        io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
+        if(socket.id && currentRoom){
+            userReadyCounter = userReadyCounter >= 0 ? userReadyCounter-- : userReadyCounter;
+            socket.leave(connectionData.room);
+            delete currentRoom.users[socket.id];
+            console.log("USERS LEFT: " + JSON.stringify(currentRoom.users));
+            io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, currentRoom.users);
+            io.sockets.in(connectionData.room).emit('refreshCurrentUsers', currentRoom.users);
+
+        }
     });
 
 });
