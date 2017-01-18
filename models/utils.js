@@ -18,13 +18,16 @@ module.exports = {
             currentRoom.users = {};
         }
         currentRoom.usersReady = 0;
-        currentRoom.currentWinner = 0;
-        currentRoom.gameDuration = 5;
+        currentRoom.currentWinner = {score: 0};
+        currentRoom.finalWinner = {score: 0};
+        currentRoom.gameDuration = 20;
+        currentRoom.roundTimeCounter = 0;
         currentRoom.users[socket] = this.setNewUser(socket.username);
     },
-    setCurrentWinner: function(socket, currentRoom, scoreData){
-
-        currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner ? scoreData : currentRoom.currentWinner;
-
+    setCurrentWinner: function(currentRoom, scoreData){
+        currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner.score ? scoreData : currentRoom.currentWinner;
+    },
+    setFinalWinner: function(currentRoom, scoreData){
+        currentRoom.finalWinner = scoreData.score > currentRoom.finalWinner.score ? scoreData : currentRoom.finalWinner;
     }
 }

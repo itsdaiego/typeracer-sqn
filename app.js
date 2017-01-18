@@ -25,9 +25,8 @@ app.get('/room/:roomname/user/:username', function(req, res){
     res.render('room', room);
 });
 
-var userReadyCounter = 0;
 var sentences = english.getEnglishSentences();
-var highestScore = 0;
+const roundTime = 5;
 
 io.sockets.on('connection', function (socket) {
     var currentRoom;
@@ -57,7 +56,16 @@ io.sockets.on('connection', function (socket) {
 
             io.sockets.in(socket.room).emit('timeRemaining', currentRoom.gameDuration);
             var intervalId = setInterval(function(){
-               currentRoom.gameDuration--;
+                currentRoom.roundTimeCounter++;
+                currentRoom.gameDuration--;
+                if(roundTime == currentRoom.roundTimeCounter){
+                    currentRoom.roundTimeCounter = 0;
+                    var scoreData  = {
+                        username: socket.username,
+                        score: socket.score
+                    };
+                    utils.setFinalWinner(currentRoom, scoreData);
+                }
                 if(currentRoom.gameDuration <= 0){
                     clearInterval(intervalId);
                     socket.emit('gameFinished', currentRoom.currentWinner);
@@ -65,18 +73,18 @@ io.sockets.on('connection', function (socket) {
                 else{
                     io.sockets.in(socket.room).emit('timeRemaining', currentRoom.gameDuration);
                 }
+        
             }, 1000);
         }
     });
-
-
+    
     socket.on('sendPlayerScore', function(username){
         var scoreData  = {
-            username: username,
+            username: socket.username,
             score: socket.score
         };
         socket.score++;
-        utils.setCurrentWinner(socket, currentRoom, scoreData);
+        utils.setCurrentWinner(currentRoom, scoreData);
         io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 
@@ -87,7 +95,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function(){
         if(socket.id && currentRoom){
-            userReadyCounter = userReadyCounter >= 0 ? userReadyCounter-- : userReadyCounter;
+            currentRoom.usersReady--;
             socket.leave(socket.room);
             delete currentRoom.users[socket.id];
             io.sockets.in(socket.room).emit('userLeft', socket.username, currentRoom.users);
