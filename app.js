@@ -16,6 +16,17 @@ app.get('/', function(re, res){
     res.render('index');
 });
 
+app.get('/room/:roomname/status', function(req, res){
+    var room = io.sockets.adapter.rooms[req.params.roomname] ? io.sockets.adapter.rooms[req.params.roomname] : undefined;
+    if(!room){
+        room = "Room does not exist!";
+        res.send(room);
+    }
+    else{
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(room));
+    }
+});
 
 app.get('/room/:roomname/user/:username', function(req, res){
     var room = {
