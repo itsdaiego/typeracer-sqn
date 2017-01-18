@@ -33,7 +33,6 @@ io.sockets.on('connection', function (socket) {
     var connectionData = {};
     var currentRoom;
     socket.on('message', function(roomData){
-        console.log("ROOM: " + JSON.stringify(roomData));
         connectionData.username = roomData.username;
         connectionData.room = roomData.roomname;
         connectionData.sentenceCounter = 0;
@@ -76,7 +75,6 @@ io.sockets.on('connection', function (socket) {
                currentRoom.gameDuration--;
                 if(currentRoom.gameDuration <= 0){
                     clearInterval(intervalId);
-                    console.log(currentRoom.currentWinner);
                     socket.emit('gameFinished', currentRoom.currentWinner);
                 }
                 else{
@@ -109,7 +107,6 @@ io.sockets.on('connection', function (socket) {
             userReadyCounter = userReadyCounter >= 0 ? userReadyCounter-- : userReadyCounter;
             socket.leave(connectionData.room);
             delete currentRoom.users[socket.id];
-            console.log("USERS LEFT: " + JSON.stringify(currentRoom.users));
             io.sockets.in(connectionData.room).emit('userLeft', connectionData.username, currentRoom.users);
             io.sockets.in(connectionData.room).emit('refreshCurrentUsers', currentRoom.users);
 
