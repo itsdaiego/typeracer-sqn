@@ -27,13 +27,12 @@ app.get('/room/:roomname/user/:username', function(req, res){
 
 var users = {};
 var userReadyCounter = 0;
-var gameDuration = 0;
 var sentences = english.getEnglishSentences();
 var highestScore = 0;
-var gameDuration = 20;
 
 io.sockets.on('connection', function (socket) {
     var connectionData = {};
+    var currentRoom;
     socket.on('message', function(roomData){
         console.log("ROOM: " + JSON.stringify(roomData));
         connectionData.username = roomData.username;
@@ -47,8 +46,13 @@ io.sockets.on('connection', function (socket) {
 
         socket.emit('userInfo', roomData);
 
-        users[socket.id] = user;
         socket.join(connectionData.room);
+
+        users[socket.id] = user;
+
+        currentRoom = io.sockets.adapter.rooms[roomData.roomname];
+        currentRoom.usersReady = 0;
+
         io.sockets.in(connectionData.room).emit('refreshCurrentUsers', users);
         socket.broadcast.to(connectionData.room).emit('userJoined', {
             username: connectionData.username,
@@ -58,16 +62,13 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('userReady', function(roomData){
-        console.log("users ready: " + userReadyCounter); 
-        console.log("rooms length" + io.sockets.adapter.rooms[connectionData.room].length); 
-        if(roomData.roomname === connectionData.room){
-            userReadyCounter++;
-        }
-        if(userReadyCounter == io.sockets.adapter.rooms[connectionData.room].length){
+        currentRoom.usersReady++;
+        if(currentRoom.usersReady == currentRoom.length){
             io.sockets.in(connectionData.room).emit('startGame');
             io.sockets.in(connectionData.room).emit('newSentence', sentences[connectionData.sentenceCounter]);
 
             io.sockets.in(connectionData.room).emit('timeRemaining', gameDuration);
+            var gameDuration = 20;
             var intervalId = setInterval(function(){
                gameDuration--;
                 if(gameDuration <= 0){
