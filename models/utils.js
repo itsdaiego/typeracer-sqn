@@ -22,7 +22,7 @@ module.exports = {
         currentRoom.finalWinner = {score: 0};
         currentRoom.gameDuration = 20;
         currentRoom.roundTimeCounter = 0;
-        currentRoom.users[socket] = this.setNewUser(socket.username);
+        currentRoom.users[socket.id] = this.setNewUser(socket.username);
     },
     setCurrentWinner: function(currentRoom, scoreData){
         currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner.score ? scoreData : currentRoom.currentWinner;
