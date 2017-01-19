@@ -28,11 +28,20 @@ module.exports = {
         currentRoom.users[socket.id] = this.setNewUser(socket.username);
     },
 
-    setCurrentWinner: function(currentRoom, scoreData){
+    setCurrentWinner: function(currentRoom, socket){
+        var scoreData = {
+            score: socket.score,
+            username: socket.username
+        }
         currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner.score ? scoreData : currentRoom.currentWinner;
     },
 
-    setFinalWinner: function(currentRoom, scoreData){
+    setFinalWinner: function(currentRoom, socket){
+        var scoreData = {
+            score: socket.score,
+            username: socket.username
+        }
         currentRoom.finalWinner = scoreData.score > currentRoom.finalWinner.score ? scoreData : currentRoom.finalWinner;
     }
+
 }

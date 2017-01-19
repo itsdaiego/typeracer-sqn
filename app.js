@@ -79,16 +79,10 @@ io.sockets.on('connection', function (socket) {
                 currentRoom.roundTimeCounter++;
                 currentRoom.gameDuration--;
                 if(roundTime == currentRoom.roundTimeCounter){
-                    currentRoom.roundTimeCounter = 0;
-                    currentRoom.totalKeystrokes = 0;
-
-                    var scoreData  = {
-                        username: socket.username,
-                        score: socket.score
-                    };
+                    roomModel.resetRoomCounters(currentRoom);
 
                     roomModel.setTotalKeystrokes(currentRoom);
-                    gameModel.setFinalWinner(currentRoom, scoreData);
+                    gameModel.setFinalWinner(currentRoom, socket);
                 }
                 if(currentRoom.gameDuration <= 0){
                     clearInterval(intervalId);
@@ -103,13 +97,13 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('sendPlayerScore', function(username){
-        var scoreData  = {
-            username: socket.username,
-            score: socket.score
-        };
         socket.score++;
         currentRoom.users[socket.id].score = socket.score;
-        gameModel.setCurrentWinner(currentRoom, scoreData);
+        gameModel.setCurrentWinner(currentRoom, socket);
+        var scoreData = {
+            username: socket.username,
+            score: socket.score
+        }
         io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 

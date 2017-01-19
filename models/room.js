@@ -46,5 +46,10 @@ module.exports = {
         }
 
         return totBelowMeanUsers;
+    },
+
+    resetRoomCounters: function(currentRoom){
+        currentRoom.roundTimeCounter = 0;
+        currentRoom.totalKeystrokes = 0;
     }
 }
