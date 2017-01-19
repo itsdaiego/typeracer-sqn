@@ -101,6 +101,7 @@ io.sockets.on('connection', function (socket) {
             score: socket.score
         };
         socket.score++;
+        currentRoom.users[socket.id].score = socket.score;
         gameModel.setCurrentWinner(currentRoom, scoreData);
         io.sockets.in(socket.room).emit('updateScore', scoreData);
     });

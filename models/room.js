@@ -6,11 +6,9 @@ module.exports = {
 
     setTotalKeystrokes: function(currentRoom){
         var totalKeystrokes = 0;
-        console.log(JSON.stringify(currentRoom));
-        for(var i = 0; i < currentRoom.length; i++){
-            totalKeystrokes += room.score;
-        } 
-
-        currentRoom.keystrokes = totalKeystrokes;
+        for(var userId in currentRoom.users){
+            totalKeystrokes += currentRoom.users[userId]['score'];
+        }
+        currentRoom.totalKeystrokes = totalKeystrokes;
     }
 }
