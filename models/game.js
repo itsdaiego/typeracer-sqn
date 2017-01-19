@@ -23,6 +23,7 @@ module.exports = {
         currentRoom.currentWinner = {score: 0};
         currentRoom.finalWinner = {score: 0};
         currentRoom.gameDuration = 20;
+        currentRoom.createdAt = new Date();
         currentRoom.roundTimeCounter = 0;
         currentRoom.users[socket.id] = this.setNewUser(socket.username);
     },

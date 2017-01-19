@@ -27,6 +27,7 @@ app.get('/room/:roomname/status', function(req, res){
     else{
         roomInfo.active_users = roomModel.getRoomActiveUsers(room);
         roomInfo.keystrokes = room.totalKeystrokes;
+        roomInfo.active_since = roomModel.getSecondsSinceRoomWasCreated(room);
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(roomInfo));
     }

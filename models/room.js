@@ -10,5 +10,10 @@ module.exports = {
             totalKeystrokes += currentRoom.users[userId]['score'];
         }
         currentRoom.totalKeystrokes = totalKeystrokes;
+    },
+
+    getSecondsSinceRoomWasCreated: function(currentRoom){
+        var timeInMilliseconds = (new Date() - currentRoom.createdAt) / 1000;
+        return parseFloat(timeInMilliseconds).toFixed(0);
     }
 }
