@@ -7,7 +7,8 @@ var server = app.listen(3000);
 var io = socket(server);
 
 var english = require('./public/english.js');
-var utils = require('./models/utils.js');
+var gameModel = require('./models/game.js');
+var roomModel = require('./models/room.js');
 
 app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/views'));
@@ -18,13 +19,16 @@ app.get('/', function(re, res){
 
 app.get('/room/:roomname/status', function(req, res){
     var room = io.sockets.adapter.rooms[req.params.roomname] ? io.sockets.adapter.rooms[req.params.roomname] : undefined;
+    var roomInfo = {};
     if(!room){
         room = "Room does not exist!";
         res.send(room);
     }
     else{
+        roomInfo.active_users = roomModel.getRoomActiveUsers(room);
+        roomInfo.keystrokes = room.totalKeystrokes;
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(room));
+        res.send(JSON.stringify(roomInfo));
     }
 });
 
@@ -42,14 +46,14 @@ const roundTime = 5;
 io.sockets.on('connection', function (socket) {
     var currentRoom;
     socket.on('message', function(roomData){
-        utils.setConnectionProperties(socket, currentRoom, roomData);
+        gameModel.setConnectionProperties(socket, currentRoom, roomData);
 
         socket.emit('userInfo', roomData);
         socket.join(socket.room);
 
 
         currentRoom = io.sockets.adapter.rooms[roomData.roomname];
-        utils.setCurrentRoomProperties(currentRoom, socket);
+        gameModel.setCurrentRoomProperties(currentRoom, socket);
         
         io.sockets.in(socket.room).emit('refreshCurrentUsers', currentRoom.users);
         socket.broadcast.to(socket.room).emit('userJoined', {
@@ -75,7 +79,9 @@ io.sockets.on('connection', function (socket) {
                         username: socket.username,
                         score: socket.score
                     };
-                    utils.setFinalWinner(currentRoom, scoreData);
+                    currentRoom.totalKeystrokes = 0;
+                    roomModel.setTotalKeystrokes(currentRoom);
+                    gameModel.setFinalWinner(currentRoom, scoreData);
                 }
                 if(currentRoom.gameDuration <= 0){
                     clearInterval(intervalId);
@@ -95,7 +101,7 @@ io.sockets.on('connection', function (socket) {
             score: socket.score
         };
         socket.score++;
-        utils.setCurrentWinner(currentRoom, scoreData);
+        gameModel.setCurrentWinner(currentRoom, scoreData);
         io.sockets.in(socket.room).emit('updateScore', scoreData);
     });
 

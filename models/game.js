@@ -6,6 +6,7 @@ module.exports = {
         };
         return user;
     },
+
     setConnectionProperties: function(socket, currentRoom, roomData){
         socket.username = roomData.username;
         socket.room = roomData.roomname;
@@ -13,6 +14,7 @@ module.exports = {
         socket.score = 0;
 
     },
+
     setCurrentRoomProperties: function(currentRoom, socket){
         if(!currentRoom.users){
             currentRoom.users = {};
@@ -24,9 +26,11 @@ module.exports = {
         currentRoom.roundTimeCounter = 0;
         currentRoom.users[socket.id] = this.setNewUser(socket.username);
     },
+
     setCurrentWinner: function(currentRoom, scoreData){
         currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner.score ? scoreData : currentRoom.currentWinner;
     },
+
     setFinalWinner: function(currentRoom, scoreData){
         currentRoom.finalWinner = scoreData.score > currentRoom.finalWinner.score ? scoreData : currentRoom.finalWinner;
     }
