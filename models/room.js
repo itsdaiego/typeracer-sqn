@@ -25,6 +25,18 @@ module.exports = {
         return meanScore;
     },
 
+    getUsersRanking: function(currentRoom){
+        var rankingList = [];
+        var sortedRankingList = [];
+        for(var userId in currentRoom.users){
+            rankingList.push(currentRoom.users[userId]);
+        }
+        rankingList.sort(function(currentPlayer, nextPlayer){
+            return nextPlayer.score - currentPlayer.score;
+        })
+        return rankingList;
+    },
+
     getBelowMeanUsers: function(meanScore, currentRoom){
         var totBelowMeanUsers = 0;
         for(var userId in currentRoom.users){

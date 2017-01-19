@@ -30,6 +30,7 @@ app.get('/room/:roomname/status', function(req, res){
         roomInfo.active_since = roomModel.getSecondsSinceRoomWasCreated(currentRoom);
         var meanScore = roomModel.getMeanScore(currentRoom);
         roomInfo.belo_mean = roomModel.getBelowMeanUsers(meanScore, currentRoom);
+        roomInfo.ranking = roomModel.getUsersRanking(currentRoom);
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(roomInfo));
     }
