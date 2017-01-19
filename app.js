@@ -29,8 +29,9 @@ app.get('/room/:roomname/status', function(req, res){
         roomInfo.keystrokes = currentRoom.totalKeystrokes;
         roomInfo.active_since = roomModel.getSecondsSinceRoomWasCreated(currentRoom);
         var meanScore = roomModel.getMeanScore(currentRoom);
-        roomInfo.belo_mean = roomModel.getBelowMeanUsers(meanScore, currentRoom);
+        roomInfo.below_mean = roomModel.getBelowMeanUsers(meanScore, currentRoom);
         roomInfo.ranking = roomModel.getUsersRanking(currentRoom);
+        roomInfo.last_minute_lead = currentRoom.currentWinner.username;
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(roomInfo));
     }
@@ -79,11 +80,13 @@ io.sockets.on('connection', function (socket) {
                 currentRoom.gameDuration--;
                 if(roundTime == currentRoom.roundTimeCounter){
                     currentRoom.roundTimeCounter = 0;
+                    currentRoom.totalKeystrokes = 0;
+
                     var scoreData  = {
                         username: socket.username,
                         score: socket.score
                     };
-                    currentRoom.totalKeystrokes = 0;
+
                     roomModel.setTotalKeystrokes(currentRoom);
                     gameModel.setFinalWinner(currentRoom, scoreData);
                 }
