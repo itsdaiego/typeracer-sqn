@@ -18,16 +18,18 @@ app.get('/', function(re, res){
 });
 
 app.get('/room/:roomname/status', function(req, res){
-    var room = io.sockets.adapter.rooms[req.params.roomname] ? io.sockets.adapter.rooms[req.params.roomname] : undefined;
+    var currentRoom = io.sockets.adapter.rooms[req.params.roomname] ? io.sockets.adapter.rooms[req.params.roomname] : undefined;
     var roomInfo = {};
-    if(!room){
-        room = "Room does not exist!";
-        res.send(room);
+    if(!currentRoom){
+        currentRoom = "Room does not exist!";
+        res.send(currentRoom);
     }
     else{
-        roomInfo.active_users = roomModel.getRoomActiveUsers(room);
-        roomInfo.keystrokes = room.totalKeystrokes;
-        roomInfo.active_since = roomModel.getSecondsSinceRoomWasCreated(room);
+        roomInfo.active_users = roomModel.getRoomActiveUsers(currentRoom);
+        roomInfo.keystrokes = currentRoom.totalKeystrokes;
+        roomInfo.active_since = roomModel.getSecondsSinceRoomWasCreated(currentRoom);
+        var meanScore = roomModel.getMeanScore(currentRoom);
+        roomInfo.belo_mean = roomModel.getBelowMeanUsers(meanScore, currentRoom);
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(roomInfo));
     }
