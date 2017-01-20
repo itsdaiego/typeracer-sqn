@@ -107,6 +107,9 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('sentenceFinished', function(){
         socket.sentenceCounter++;
+        if(socket.sentenceCounter == sentences.length){
+            socket.sentenceCounter = 0;
+        }
         socket.emit('newSentence', sentences[socket.sentenceCounter]);
     });
 
