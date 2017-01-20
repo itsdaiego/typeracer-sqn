@@ -6,18 +6,15 @@ var listOfWords = [];
 var username;
 var roomData;
 
-socket.on('userInfo', function(userInfo){
-    username = userInfo.username;
-    roomData = userInfo;
-});
-
 socket.on('refreshCurrentUsers', function(users){
     clearNewUsers();
     refreshCurrentUsers(users);
 });
 
-socket.on('userJoined', function(roomData){
+socket.on('userJoined', function(userInfo){
     clearJoinedUsers();
+    username = userInfo.username;
+    roomData = userInfo;
     pushUsersNotification(username, ' has joined the room <br/>');
 });
 

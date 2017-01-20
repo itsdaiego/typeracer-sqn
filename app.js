@@ -45,15 +45,13 @@ app.get('/room/:roomname/user/:username', function(req, res){
     res.render('room', room);
 });
 
-var sentences = sentences.getEnglishSentences();
-const roundTime = 5;
+var sentences = sentences.getSampleSentences();
 
 io.sockets.on('connection', function (socket) {
     var currentRoom;
     socket.on('message', function(roomData){
         gameModel.setConnectionProperties(socket, currentRoom, roomData);
 
-        socket.emit('userInfo', roomData);
         socket.join(socket.room);
 
 
@@ -78,7 +76,7 @@ io.sockets.on('connection', function (socket) {
             var intervalId = setInterval(function(){
                 currentRoom.roundTimeCounter++;
                 currentRoom.gameDuration--;
-                if(roundTime == currentRoom.roundTimeCounter){
+                if(currentRoom.roundTime == currentRoom.roundTimeCounter){
                     roomModel.resetRoomCounters(currentRoom);
 
                     roomModel.setTotalKeystrokes(currentRoom);

@@ -22,6 +22,7 @@ module.exports = {
         currentRoom.usersReady = 0;
         currentRoom.currentWinner = {score: 0};
         currentRoom.finalWinner = {score: 0};
+        currentRoom.roundTime = 60;
         currentRoom.gameDuration = 20;
         currentRoom.createdAt = new Date();
         currentRoom.roundTimeCounter = 0;
