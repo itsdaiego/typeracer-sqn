@@ -31,7 +31,7 @@ app.get('/room/:roomname/status', function(req, res){
         var meanScore = roomModel.getMeanScore(currentRoom);
         roomInfo.below_mean = roomModel.getBelowMeanUsers(meanScore, currentRoom);
         roomInfo.ranking = roomModel.getUsersRanking(currentRoom);
-        roomInfo.last_minute_lead = currentRoom.currentWinner.username;
+        roomInfo.last_minute_lead = currentRoom.finalWinner.username;
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(roomInfo));
     }
@@ -45,7 +45,7 @@ app.get('/room/:roomname/user/:username', function(req, res){
     res.render('room', room);
 });
 
-var sentences = sentences.getSampleSentences();
+var sentences = sentences.getEnglishSentences();
 
 io.sockets.on('connection', function (socket) {
     var currentRoom;
@@ -80,11 +80,13 @@ io.sockets.on('connection', function (socket) {
                     roomModel.resetRoomCounters(currentRoom);
 
                     roomModel.setTotalKeystrokes(currentRoom);
-                    gameModel.setFinalWinner(currentRoom, socket);
+                    gameModel.setFinalWinner(currentRoom);
+                    io.sockets.in(socket.room).emit('roundFinished');
+
                 }
                 if(currentRoom.gameDuration <= 0){
                     clearInterval(intervalId);
-                    socket.emit('gameFinished', currentRoom.currentWinner);
+                    socket.emit('gameFinished', currentRoom.finalWinner);
                 }
                 else{
                     io.sockets.in(socket.room).emit('timeRemaining', currentRoom.gameDuration);
@@ -93,16 +95,16 @@ io.sockets.on('connection', function (socket) {
             }, 1000);
         }
     });
+
+    socket.on('resetScore', function(username){
+        socket.score = 0;
+    });
     
     socket.on('sendPlayerScore', function(username){
         socket.score++;
         currentRoom.users[socket.id].score = socket.score;
         gameModel.setCurrentWinner(currentRoom, socket);
-        var scoreData = {
-            username: socket.username,
-            score: socket.score
-        }
-        io.sockets.in(socket.room).emit('updateScore', scoreData);
+        gameModel.updateScore(io, socket);
     });
 
     socket.on('sentenceFinished', function(){

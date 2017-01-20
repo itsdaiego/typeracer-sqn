@@ -22,8 +22,8 @@ module.exports = {
         currentRoom.usersReady = 0;
         currentRoom.currentWinner = {score: 0};
         currentRoom.finalWinner = {score: 0};
-        currentRoom.roundTime = 60;
-        currentRoom.gameDuration = 180;
+        currentRoom.roundTime = 10;
+        currentRoom.gameDuration = 40;
         currentRoom.createdAt = new Date();
         currentRoom.roundTimeCounter = 0;
         currentRoom.users[socket.id] = this.setNewUser(socket.username);
@@ -37,12 +37,17 @@ module.exports = {
         currentRoom.currentWinner = scoreData.score > currentRoom.currentWinner.score ? scoreData : currentRoom.currentWinner;
     },
 
-    setFinalWinner: function(currentRoom, socket){
+    setFinalWinner: function(currentRoom){
+        currentRoom.finalWinner = currentRoom.currentWinner.score > currentRoom.finalWinner.score ? currentRoom.currentWinner : currentRoom.finalWinner;
+    },
+
+    updateScore: function(io, socket){
         var scoreData = {
-            score: socket.score,
-            username: socket.username
+            username: socket.username,
+            score: socket.score
         }
-        currentRoom.finalWinner = scoreData.score > currentRoom.finalWinner.score ? scoreData : currentRoom.finalWinner;
+        io.sockets.in(socket.room).emit('updateScore', scoreData);
+
     }
 
 }

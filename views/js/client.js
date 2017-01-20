@@ -44,6 +44,10 @@ socket.on('timeRemaining', function(gameDuration){
     showTimer(gameDuration);
 });
 
+socket.on('roundFinished', function(){
+    socket.emit('resetScore', username);
+});
+
 socket.on('gameFinished', function(scoreData){
     alert(scoreData.username +  ' is the winner!!! ');
 });
