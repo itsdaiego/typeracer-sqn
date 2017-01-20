@@ -6,7 +6,7 @@ var server = app.listen(3000);
 
 var io = socket(server);
 
-var english = require('./public/english.js');
+var sentences = require('./public/sentences.js');
 var gameModel = require('./models/game.js');
 var roomModel = require('./models/room.js');
 
@@ -45,7 +45,7 @@ app.get('/room/:roomname/user/:username', function(req, res){
     res.render('room', room);
 });
 
-var sentences = english.getEnglishSentences();
+var sentences = sentences.getEnglishSentences();
 const roundTime = 5;
 
 io.sockets.on('connection', function (socket) {
