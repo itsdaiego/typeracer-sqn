@@ -61,7 +61,7 @@ io.sockets.on('connection', function (socket) {
         io.sockets.in(socket.room).emit('refreshCurrentUsers', currentRoom.users);
         socket.broadcast.to(socket.room).emit('userJoined', {
             username: socket.username,
-            roomname: socket.roomname
+            roomname: socket.room
         });
 
     });
