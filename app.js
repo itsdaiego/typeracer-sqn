@@ -6,8 +6,7 @@ var socket = require('socket.io')
 var app = express()
 var server = app.listen(3000)
 
-var io = socket(server)
-
+var io = require('./socket.js').startServer(server)
 var sentences = require('./public/sentences.js')
 var gameModel = require('./models/game.js')
 var roomModel = require('./models/room.js')

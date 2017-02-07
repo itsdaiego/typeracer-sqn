@@ -29,8 +29,8 @@ describe('New Connection',function(){
                 done()
                 client.disconnect()
             })
+            client.send(roomData)
         })
-        client.send(roomData)
     })
 
     it('should fire userJoined event to all users but the user the has just joined', function(done){
@@ -53,28 +53,26 @@ describe('New Connection',function(){
                     expect(data.roomname).to.equal(roomData.roomname)
                 })
             })
+            client.send(roomData)
+            done()
+            client.disconnect()
+            client2.disconnect()
+            client3.disconnect()
         })
-        client.send(roomData)
-        done()
-        client.disconnect()
-        client2.disconnect()
-        client3.disconnect()
     })
 
     it('should fire userReady event only when the number of players are equal to the ready players number', function(done){
         var client = io.connect('http://localhost:3000')
-        
-        client.on('connect', function(){
-            console.log('im here')
-            // client.emit('userReady', roomData) 
 
-            // client.on('startGame', function(data){
-            //     expect(data).to.equal(1)
-            // })
-            client.send(roomData)
-            done()
-            client.disconnect()
+        client.on('connect', function(){
+            client.on('startGame', function(data){
+                expect(data).to.equal(1)
+            })
+            client.emit('userReady', roomData) 
         })
+        client.send(roomData);
+        done()
+        client.disconnect()
 
     })
 
