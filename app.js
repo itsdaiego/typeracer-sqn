@@ -8,7 +8,7 @@ var server = app.listen(3000)
 var gameModel = require('./models/game.js')
 var roomModel = require('./models/room.js')
 var sentences = require('./public/sentences.js')
-var io = require('./socket.js').startServer(server, roomModel, gameModel, sentences)
+var io = require('./socket.js').startGame(server, roomModel, gameModel, sentences)
 
 app.set('view engine', 'jade')
 app.use(express.static(__dirname + '/views'))

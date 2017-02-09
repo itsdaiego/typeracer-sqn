@@ -1,3 +1,5 @@
+"use strict"
+
 module.exports = {
     setNewUser: function(username){
         var user = {
@@ -48,6 +50,9 @@ module.exports = {
         }
         io.sockets.in(socket.room).emit('updateScore', scoreData);
 
-    }
+    },
 
+    updatePlayerScore: function(socket, currentRoom){
+        currentRoom.users[socket.id].score = socket.score
+    }
 }
